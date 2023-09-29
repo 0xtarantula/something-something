@@ -10,7 +10,10 @@ import "../interfaces/IRewarder.sol";
 
 /// @notice The interface of the target contract.
 interface IMockChef {
-    function pendingMockRewardToken(uint256 _pid, address _user) external view returns (uint256);
+    function pendingMockRewardToken(
+        uint256 _pid,
+        address _user
+    ) external view returns (uint256);
 
     function deposit(uint256 _pid, uint256 _amount) external;
 
@@ -75,7 +78,10 @@ contract MockAdapter is IMasterAdapter, Ownable {
     /**
      * @dev Allows the owner (OptimisedChef) to withdraw the specified amount of LP tokens from the target MockChef.
      */
-    function withdraw(uint256 _amount, address _sender) external override onlyOwner {
+    function withdraw(
+        uint256 _amount,
+        address _sender
+    ) external override onlyOwner {
         i_targetMockChef.withdraw(i_targetPoolId, _amount);
         i_lpToken.safeTransfer(_sender, _amount);
         s_adapterBalance -= _amount;
@@ -84,7 +90,10 @@ contract MockAdapter is IMasterAdapter, Ownable {
     /**
      * @dev Allows the owner (OptimisedChef) to perform an emergency withdrawal of LP tokens from the target MockChef.
      */
-    function emergencyWithdraw(uint256 _amount, address _sender) external override onlyOwner {
+    function emergencyWithdraw(
+        uint256 _amount,
+        address _sender
+    ) external override onlyOwner {
         i_targetMockChef.withdraw(i_targetPoolId, _amount);
         i_lpToken.safeTransfer(_sender, _amount);
         s_adapterBalance -= _amount;
@@ -118,7 +127,9 @@ contract MockAdapter is IMasterAdapter, Ownable {
     }
 
     function getAccReward() external view override returns (uint256) {
-        return s_accAdapterReward;
+        uint256 pendingAccRewardSinceLastUpdate = i_targetMockChef
+            .pendingMockRewardToken(i_targetPoolId, address(this));
+        return pendingAccRewardSinceLastUpdate;
     }
 
     function getRewardRate() external view override returns (uint256) {
